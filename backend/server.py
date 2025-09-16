@@ -243,7 +243,14 @@ async def get_equipment(
     current_user: User = Depends(get_current_user)
 ):
     equipment_list = await db.equipment.find().skip(skip).limit(limit).sort("created_at", -1).to_list(1000)
-    return [Equipment(**equipment) for equipment in equipment_list]
+    # Convert ObjectId to string and remove _id
+    cleaned_equipment = []
+    for equipment in equipment_list:
+        equipment_data = {k: (str(v) if isinstance(v, ObjectId) else v) for k, v in equipment.items()}
+        if "_id" in equipment_data:
+            del equipment_data["_id"]
+        cleaned_equipment.append(Equipment(**equipment_data))
+    return cleaned_equipment
 
 @api_router.post("/equipment/filter", response_model=List[Equipment])
 async def filter_equipment(
