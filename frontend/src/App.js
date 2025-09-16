@@ -413,13 +413,29 @@ const Dashboard = () => {
   );
 };
 
+// Import additional components
+import EquipmentList from './components/EquipmentList';
+
 // Main App Component
 const MainApp = () => {
+  const [currentPage, setCurrentPage] = useState('dashboard');
+
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'dashboard':
+        return <Dashboard />;
+      case 'equipment':
+        return <EquipmentList />;
+      default:
+        return <Dashboard />;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation />
+      <Navigation currentPage={currentPage} setCurrentPage={setCurrentPage} />
       <main>
-        <Dashboard />
+        {renderPage()}
       </main>
     </div>
   );
