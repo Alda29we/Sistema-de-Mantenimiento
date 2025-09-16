@@ -259,36 +259,80 @@ const Login = () => {
 };
 
 // Navigation Component
-const Navigation = () => {
+const Navigation = ({ currentPage, setCurrentPage }) => {
   const { user, logout } = useAuth();
+
+  const menuItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: '📊' },
+    { id: 'equipment', label: 'Gestión de Equipos', icon: '💻' }
+  ];
 
   return (
     <nav className="bg-white shadow-lg border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-8">
             <div className="flex-shrink-0">
               <h1 className="text-xl font-bold text-gray-900">
                 Sistema de Mantenimiento
               </h1>
             </div>
+            
+            <div className="hidden md:flex space-x-8">
+              {menuItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => setCurrentPage(item.id)}
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    currentPage === item.id
+                      ? 'bg-blue-100 text-blue-700'
+                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <span>{item.icon}</span>
+                  <span>{item.label}</span>
+                </button>
+              ))}
+            </div>
           </div>
           
           <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-600">
-              Bienvenido, <span className="font-medium">{user?.full_name}</span>
-              {user?.role === 'admin' && (
-                <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                  Admin
-                </span>
-              )}
-            </span>
+            <div className="hidden sm:block">
+              <span className="text-sm text-gray-600">
+                Bienvenido, <span className="font-medium">{user?.full_name}</span>
+                {user?.role === 'admin' && (
+                  <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                    Admin
+                  </span>
+                )}
+              </span>
+            </div>
             <button
               onClick={logout}
               className="text-red-600 hover:text-red-700 text-sm font-medium"
             >
               Cerrar Sesión
             </button>
+          </div>
+        </div>
+        
+        {/* Mobile menu */}
+        <div className="md:hidden border-t border-gray-200">
+          <div className="flex space-x-1 px-2 py-3">
+            {menuItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setCurrentPage(item.id)}
+                className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium flex-1 justify-center ${
+                  currentPage === item.id
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <span>{item.icon}</span>
+                <span className="hidden sm:inline">{item.label}</span>
+              </button>
+            ))}
           </div>
         </div>
       </div>
