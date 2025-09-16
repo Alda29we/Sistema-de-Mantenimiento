@@ -280,7 +280,14 @@ async def filter_equipment(
         ]
     
     equipment_list = await db.equipment.find(query).skip(skip).limit(limit).sort("created_at", -1).to_list(1000)
-    return [Equipment(**equipment) for equipment in equipment_list]
+    # Convert ObjectId to string and remove _id
+    cleaned_equipment = []
+    for equipment in equipment_list:
+        equipment_data = {k: (str(v) if isinstance(v, ObjectId) else v) for k, v in equipment.items()}
+        if "_id" in equipment_data:
+            del equipment_data["_id"]
+        cleaned_equipment.append(Equipment(**equipment_data))
+    return cleaned_equipment
 
 @api_router.put("/equipment/{equipment_id}", response_model=Equipment)
 async def update_equipment(
