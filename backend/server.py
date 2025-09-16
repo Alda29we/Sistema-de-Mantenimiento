@@ -157,7 +157,13 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     user = await db.users.find_one({"username": username})
     if user is None:
         raise credentials_exception
-    return User(**user)
+    
+    # Convert ObjectId to string and remove _id
+    user_data = {k: (str(v) if isinstance(v, ObjectId) else v) for k, v in user.items() if k != "password"}
+    if "_id" in user_data:
+        del user_data["_id"]
+    
+    return User(**user_data)
 
 async def get_admin_user(current_user: User = Depends(get_current_user)):
     if current_user.role != "admin":
