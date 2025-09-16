@@ -306,7 +306,11 @@ async def update_equipment(
     await db.equipment.update_one({"id": equipment_id}, {"$set": update_data})
     
     updated_equipment = await db.equipment.find_one({"id": equipment_id})
-    return Equipment(**updated_equipment)
+    # Convert ObjectId to string and remove _id
+    equipment_data = {k: (str(v) if isinstance(v, ObjectId) else v) for k, v in updated_equipment.items()}
+    if "_id" in equipment_data:
+        del equipment_data["_id"]
+    return Equipment(**equipment_data)
 
 @api_router.delete("/equipment/{equipment_id}")
 async def delete_equipment(
