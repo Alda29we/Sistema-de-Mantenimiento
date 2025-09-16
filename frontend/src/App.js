@@ -507,7 +507,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route
-            path="/*"
+            path="/"
             element={
               <ProtectedRoute>
                 <MainApp />
