@@ -205,7 +205,10 @@ async def login_user(user_credentials: UserLogin):
         data={"sub": user["username"]}, expires_delta=access_token_expires
     )
     
-    user_data = {k: v for k, v in user.items() if k != "password"}
+    # Convert ObjectId to string and remove password
+    user_data = {k: (str(v) if isinstance(v, ObjectId) else v) for k, v in user.items() if k != "password"}
+    if "_id" in user_data:
+        del user_data["_id"]
     
     return {
         "access_token": access_token,
