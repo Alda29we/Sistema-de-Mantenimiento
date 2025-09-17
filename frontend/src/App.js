@@ -294,22 +294,60 @@ const Navigation = ({ currentPage, setCurrentPage, onPasswordChange }) => {
           </div>
           
           <div className="flex items-center space-x-4">
-            <div className="hidden sm:block">
-              <span className="text-sm text-gray-600">
-                Bienvenido, <span className="font-medium">{user?.full_name}</span>
-                {user?.role === 'admin' && (
-                  <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                    Admin
-                  </span>
-                )}
-              </span>
+            <div className="hidden sm:block relative">
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="flex items-center space-x-2 text-sm text-gray-600 hover:text-gray-900 focus:outline-none"
+              >
+                <span>
+                  Bienvenido, <span className="font-medium">{user?.full_name}</span>
+                  {user?.role === 'admin' && (
+                    <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                      Admin
+                    </span>
+                  )}
+                  {user?.must_change_password && (
+                    <span className="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
+                      Cambiar contraseña
+                    </span>
+                  )}
+                </span>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {showUserMenu && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border">
+                  <button
+                    onClick={() => {
+                      onPasswordChange();
+                      setShowUserMenu(false);
+                    }}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Cambiar Contraseña
+                  </button>
+                  <button
+                    onClick={logout}
+                    className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                  >
+                    Cerrar Sesión
+                  </button>
+                </div>
+              )}
             </div>
-            <button
-              onClick={logout}
-              className="text-red-600 hover:text-red-700 text-sm font-medium"
-            >
-              Cerrar Sesión
-            </button>
+            
+            <div className="sm:hidden">
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="text-gray-600 hover:text-gray-900"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
         
