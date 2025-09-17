@@ -26,17 +26,12 @@ const EquipmentForm = ({ onSubmit, onCancel, initialData = null }) => {
     setError('');
 
     try {
-      const submitData = {
-        ...formData,
-        fecha: new Date(formData.fecha).toISOString()
-      };
-
       if (initialData) {
         // Update existing equipment
-        await axios.put(`${API}/equipment/${initialData.id}`, submitData);
+        await axios.put(`${API}/equipment/${initialData.id}`, formData);
       } else {
         // Create new equipment
-        await axios.post(`${API}/equipment`, submitData);
+        await axios.post(`${API}/equipment`, formData);
       }
 
       onSubmit();
