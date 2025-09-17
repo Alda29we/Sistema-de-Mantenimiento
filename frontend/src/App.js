@@ -254,12 +254,14 @@ const Login = () => {
 };
 
 // Navigation Component
-const Navigation = ({ currentPage, setCurrentPage }) => {
+const Navigation = ({ currentPage, setCurrentPage, onPasswordChange }) => {
   const { user, logout } = useAuth();
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-    { id: 'equipment', label: 'Gestión de Equipos', icon: '💻' }
+    { id: 'equipment', label: 'Gestión de Equipos', icon: '💻' },
+    ...(user?.role === 'admin' ? [{ id: 'users', label: 'Gestión de Usuarios', icon: '👥' }] : [])
   ];
 
   return (
