@@ -198,6 +198,13 @@ async def get_admin_user(current_user: User = Depends(get_current_user)):
 # Routes
 @api_router.post("/register", response_model=User)
 async def register_user(user: UserCreate):
+    # Only allow normal user registration
+    if user.role != "user":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only normal users can be registered through this endpoint"
+        )
+    
     # Check if user exists
     existing_user = await db.users.find_one({"$or": [{"username": user.username}, {"email": user.email}]})
     if existing_user:
