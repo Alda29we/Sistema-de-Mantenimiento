@@ -48,7 +48,9 @@ class User(BaseModel):
     full_name: str
     role: str = "user"  # "admin" or "user"
     is_active: bool = True
+    must_change_password: bool = False
     created_at: datetime = Field(default_factory=datetime.utcnow)
+    last_login: Optional[datetime] = None
 
 class UserCreate(BaseModel):
     username: str
@@ -56,6 +58,26 @@ class UserCreate(BaseModel):
     password: str
     full_name: str
     role: str = "user"
+
+class UserCreateByAdmin(BaseModel):
+    username: str
+    email: str
+    full_name: str
+    role: str
+    temporary_password: str
+
+class UserUpdate(BaseModel):
+    full_name: Optional[str] = None
+    email: Optional[str] = None
+    is_active: Optional[bool] = None
+    role: Optional[str] = None
+
+class PasswordChange(BaseModel):
+    current_password: str
+    new_password: str
+
+class PasswordReset(BaseModel):
+    new_password: str
 
 class UserLogin(BaseModel):
     username: str
