@@ -155,30 +155,23 @@ const EquipmentForm = ({ onSubmit, onCancel, initialData = null }) => {
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="form-label">Fecha del Mantenimiento</label>
-                <input
-                  type="datetime-local"
-                  required
-                  value={formData.fecha}
-                  onChange={(e) => handleChange('fecha', e.target.value)}
-                  className="form-input"
-                />
-              </div>
+            <div>
+              <label className="form-label">Tipo de Mantenimiento</label>
+              <select
+                value={formData.tipo_mantenimiento}
+                onChange={(e) => handleChange('tipo_mantenimiento', e.target.value)}
+                className="form-select"
+              >
+                <option value="preventivo">Preventivo</option>
+                <option value="correctivo">Correctivo</option>
+                <option value="limpieza">Limpieza</option>
+              </select>
+            </div>
 
-              <div>
-                <label className="form-label">Tipo de Mantenimiento</label>
-                <select
-                  value={formData.tipo_mantenimiento}
-                  onChange={(e) => handleChange('tipo_mantenimiento', e.target.value)}
-                  className="form-select"
-                >
-                  <option value="preventivo">Preventivo</option>
-                  <option value="correctivo">Correctivo</option>
-                  <option value="limpieza">Limpieza</option>
-                </select>
-              </div>
+            <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg">
+              <p className="text-sm text-blue-800">
+                <strong>Nota:</strong> La fecha del mantenimiento se registrará automáticamente como la fecha actual.
+              </p>
             </div>
 
             <div>
