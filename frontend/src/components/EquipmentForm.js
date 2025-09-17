@@ -12,7 +12,6 @@ const EquipmentForm = ({ onSubmit, onCancel, initialData = null }) => {
     marca: initialData?.marca || '',
     modelo: initialData?.modelo || '',
     serie: initialData?.serie || '',
-    fecha: initialData?.fecha ? new Date(initialData.fecha).toISOString().slice(0, 16) : new Date().toISOString().slice(0, 16),
     tipo_mantenimiento: initialData?.tipo_mantenimiento || 'preventivo',
     observaciones: initialData?.observaciones || '',
     estado_equipo: initialData?.estado_equipo || 'operativo'
