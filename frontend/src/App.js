@@ -454,6 +454,8 @@ const Dashboard = () => {
 
 // Import additional components
 import EquipmentList from './components/EquipmentList';
+import UserManagement from './components/UserManagement';
+import PasswordChange from './components/PasswordChange';
 
 // Main App Component
 const MainApp = () => {
