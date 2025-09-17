@@ -267,6 +267,126 @@ async def login_user(user_credentials: UserLogin):
 async def read_users_me(current_user: User = Depends(get_current_user)):
     return current_user
 
+@api_router.post("/admin/users", response_model=User)
+async def create_user_by_admin(user: UserCreateByAdmin, current_user: User = Depends(get_admin_user)):
+    # Check if user exists
+    existing_user = await db.users.find_one({"$or": [{"username": user.username}, {"email": user.email}]})
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Username or email already registered"
+        )
+    
+    # Hash temporary password
+    hashed_password = get_password_hash(user.temporary_password)
+    
+    # Create user with must_change_password flag
+    user_data = {
+        "id": str(uuid.uuid4()),
+        "username": user.username,
+        "email": user.email,
+        "full_name": user.full_name,
+        "role": user.role,
+        "is_active": True,
+        "must_change_password": True,
+        "created_at": datetime.utcnow(),
+        "password": hashed_password
+    }
+    
+    user_obj = User(**{k: v for k, v in user_data.items() if k != "password"})
+    
+    # Insert in database
+    await db.users.insert_one(user_data)
+    return user_obj
+
+@api_router.get("/admin/users", response_model=List[User])
+async def get_all_users(current_user: User = Depends(get_admin_user)):
+    users = await db.users.find().to_list(1000)
+    cleaned_users = []
+    for user in users:
+        user_data = {k: (str(v) if isinstance(v, ObjectId) else v) for k, v in user.items() if k != "password"}
+        if "_id" in user_data:
+            del user_data["_id"]
+        cleaned_users.append(User(**user_data))
+    return cleaned_users
+
+@api_router.put("/admin/users/{user_id}", response_model=User)
+async def update_user_by_admin(
+    user_id: str,
+    user_update: UserUpdate,
+    current_user: User = Depends(get_admin_user)
+):
+    user = await db.users.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    update_data = {k: v for k, v in user_update.dict().items() if v is not None}
+    
+    await db.users.update_one({"id": user_id}, {"$set": update_data})
+    
+    updated_user = await db.users.find_one({"id": user_id})
+    user_data = {k: (str(v) if isinstance(v, ObjectId) else v) for k, v in updated_user.items() if k != "password"}
+    if "_id" in user_data:
+        del user_data["_id"]
+    return User(**user_data)
+
+@api_router.post("/admin/users/{user_id}/reset-password")
+async def reset_user_password(
+    user_id: str,
+    password_reset: PasswordReset,
+    current_user: User = Depends(get_admin_user)
+):
+    user = await db.users.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    hashed_password = get_password_hash(password_reset.new_password)
+    
+    await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"password": hashed_password, "must_change_password": True}}
+    )
+    
+    return {"message": "Password reset successfully. User must change password on next login."}
+
+@api_router.post("/change-password")
+async def change_password(
+    password_change: PasswordChange,
+    current_user: User = Depends(get_current_user)
+):
+    user = await db.users.find_one({"username": current_user.username})
+    if not user or not verify_password(password_change.current_password, user["password"]):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Current password is incorrect"
+        )
+    
+    hashed_password = get_password_hash(password_change.new_password)
+    
+    await db.users.update_one(
+        {"username": current_user.username},
+        {"$set": {"password": hashed_password, "must_change_password": False}}
+    )
+    
+    return {"message": "Password changed successfully"}
+
+@api_router.delete("/admin/users/{user_id}")
+async def delete_user_by_admin(
+    user_id: str,
+    current_user: User = Depends(get_admin_user)
+):
+    # Don't allow deleting yourself
+    if user_id == current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot delete your own account"
+        )
+    
+    result = await db.users.delete_one({"id": user_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"message": "User deleted successfully"}
+
 @api_router.post("/equipment", response_model=Equipment)
 async def create_equipment(equipment: EquipmentCreate, current_user: User = Depends(get_current_user)):
     equipment_data = equipment.dict()
