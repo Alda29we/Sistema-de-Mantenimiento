@@ -388,6 +388,7 @@ async def delete_user_by_admin(
 @api_router.post("/equipment", response_model=Equipment)
 async def create_equipment(equipment: EquipmentCreate, current_user: User = Depends(get_current_user)):
     equipment_data = equipment.dict()
+    equipment_data["fecha"] = datetime.utcnow()  # Set current date automatically
     equipment_data["created_by"] = current_user.username
     equipment_data["tecnico_responsable"] = current_user.full_name
     
