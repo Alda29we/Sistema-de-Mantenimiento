@@ -123,7 +123,6 @@ class EquipmentUpdate(BaseModel):
     marca: Optional[str] = None
     modelo: Optional[str] = None
     serie: Optional[str] = None
-    fecha: Optional[datetime] = None
     tipo_mantenimiento: Optional[str] = None
     observaciones: Optional[str] = None
     estado_equipo: Optional[str] = None
