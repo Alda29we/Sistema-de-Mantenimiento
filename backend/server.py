@@ -235,6 +235,18 @@ async def login_user(user_credentials: UserLogin):
             headers={"WWW-Authenticate": "Bearer"},
         )
     
+    if not user.get("is_active", True):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Account is deactivated"
+        )
+    
+    # Update last login
+    await db.users.update_one(
+        {"username": user_credentials.username},
+        {"$set": {"last_login": datetime.utcnow()}}
+    )
+    
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": user["username"]}, expires_delta=access_token_expires
