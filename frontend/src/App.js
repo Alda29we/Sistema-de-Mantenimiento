@@ -459,7 +459,21 @@ import PasswordChange from './components/PasswordChange';
 
 // Main App Component
 const MainApp = () => {
+  const { user } = useAuth();
   const [currentPage, setCurrentPage] = useState('dashboard');
+  const [showPasswordChange, setShowPasswordChange] = useState(false);
+
+  // Check if user must change password
+  useEffect(() => {
+    if (user?.must_change_password) {
+      setShowPasswordChange(true);
+    }
+  }, [user]);
+
+  const handlePasswordChangeSuccess = () => {
+    setShowPasswordChange(false);
+    window.location.reload(); // Reload to get updated user info
+  };
 
   const renderPage = () => {
     switch (currentPage) {
@@ -467,6 +481,8 @@ const MainApp = () => {
         return <Dashboard />;
       case 'equipment':
         return <EquipmentList />;
+      case 'users':
+        return <UserManagement />;
       default:
         return <Dashboard />;
     }
@@ -474,10 +490,22 @@ const MainApp = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation currentPage={currentPage} setCurrentPage={setCurrentPage} />
+      <Navigation 
+        currentPage={currentPage} 
+        setCurrentPage={setCurrentPage}
+        onPasswordChange={() => setShowPasswordChange(true)}
+      />
       <main>
         {renderPage()}
       </main>
+      
+      {/* Password Change Modal */}
+      {showPasswordChange && (
+        <PasswordChange
+          onClose={() => !user?.must_change_password && setShowPasswordChange(false)}
+          onSuccess={handlePasswordChangeSuccess}
+        />
+      )}
     </div>
   );
 };
