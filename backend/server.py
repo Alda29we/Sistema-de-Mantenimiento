@@ -113,7 +113,6 @@ class EquipmentCreate(BaseModel):
     marca: str
     modelo: str
     serie: str
-    fecha: datetime
     tipo_mantenimiento: str
     observaciones: str
     estado_equipo: str = "operativo"
